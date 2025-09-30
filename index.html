@@ -1,12 +1,607 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Core 1 Interaction</title>
-  </head>
-  <body>
-    <h1>Welcome to Core 1 Interaction Page</h1>
-    <p>This is a simple HTML page.</p>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>glitchboy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            image-rendering: pixelated;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            filter: contrast(1.2);
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
+
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            opacity: 0.08;
+            pointer-events: none;
+            animation: noise 0.2s infinite;
+        }
+
+        @keyframes noise {
+            0%, 100% { background-position: 0 0; }
+            10% { background-position: -5% -10%; }
+            20% { background-position: -15% 5%; }
+            30% { background-position: 7% -25%; }
+            40% { background-position: -5% 25%; }
+            50% { background-position: -15% 10%; }
+            60% { background-position: 15% 0%; }
+            70% { background-position: 0% 15%; }
+            80% { background-position: 3% 35%; }
+            90% { background-position: -10% 10%; }
+        }
+
+        .title {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+        }
+
+        .title h1 {
+            font-size: 4.5em;
+            font-weight: 900;
+            letter-spacing: 12px;
+            color: #fff;
+            text-transform: uppercase;
+            animation: glitchText 2s infinite;
+            position: relative;
+            text-shadow: 
+                2px 2px 0px #000,
+                -2px -2px 0px #000;
+        }
+
+        @keyframes glitchText {
+            0%, 100% { 
+                transform: translate(0);
+                text-shadow: 2px 2px 0px #000, -2px -2px 0px #000;
+            }
+            20% { 
+                transform: translate(-3px, 3px);
+                text-shadow: 3px 0px 0px #fff, -3px 0px 0px #fff;
+            }
+            40% { 
+                transform: translate(3px, -3px);
+                text-shadow: 0px 3px 0px #fff, 0px -3px 0px #fff;
+            }
+            60% { 
+                transform: translate(-3px, -3px);
+                text-shadow: 2px 2px 0px #000, -2px -2px 0px #000;
+            }
+            80% { 
+                transform: translate(3px, 3px);
+                text-shadow: 3px 0px 0px #fff, -3px 0px 0px #fff;
+            }
+        }
+
+        .title p {
+            font-size: 1em;
+            color: #888;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .music-player {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: #000;
+            border: 3px solid #fff;
+            padding: 25px 40px;
+            min-width: 400px;
+            box-shadow: 
+                5px 5px 0px #fff,
+                10px 10px 0px #000,
+                10px 10px 0px #fff;
+        }
+
+        .now-playing {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #fff;
+            padding-bottom: 15px;
+        }
+
+        .now-playing h3 {
+            color: #fff;
+            font-size: 0.8em;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        .song-title {
+            font-size: 1.2em;
+            color: #fff;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .song-artist {
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            background: #fff;
+            color: #000;
+            border: 3px solid #fff;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+            font-size: 1.2em;
+            font-weight: bold;
+            box-shadow: 3px 3px 0px #888;
+        }
+
+        .control-btn:hover {
+            background: #000;
+            color: #fff;
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #888;
+        }
+
+        .control-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: none;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .volume-control label {
+            color: #fff;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 200px;
+            height: 8px;
+            background: #fff;
+            border: 2px solid #000;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #000;
+            border: 3px solid #fff;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px #888;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #000;
+            border: 3px solid #fff;
+            cursor: pointer;
+        }
+
+        .playlist {
+            position: fixed;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: #000;
+            border: 3px solid #fff;
+            padding: 20px;
+            max-width: 280px;
+            box-shadow: 
+                5px 5px 0px #fff,
+                10px 10px 0px #000,
+                10px 10px 0px #fff;
+        }
+
+        .playlist h3 {
+            color: #fff;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+            text-align: center;
+            border-bottom: 2px solid #fff;
+            padding-bottom: 10px;
+        }
+
+        .song-item {
+            margin: 15px 0;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.1s;
+            background: #000;
+            border: 2px solid #fff;
+        }
+
+        .song-item:hover {
+            background: #fff;
+            color: #000;
+            transform: translate(3px, 3px);
+        }
+
+        .song-item.active {
+            background: #fff;
+            color: #000;
+            border: 2px solid #000;
+            box-shadow: inset 3px 3px 0px #888;
+        }
+
+        .song-item-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+
+        .song-item-artist {
+            font-size: 0.75em;
+            opacity: 0.7;
+        }
+
+        .star-label {
+            position: absolute;
+            background: #fff;
+            color: #000;
+            padding: 8px 12px;
+            font-size: 0.75em;
+            font-weight: bold;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.1s;
+            z-index: 5;
+            border: 2px solid #000;
+            text-transform: uppercase;
+            box-shadow: 3px 3px 0px #000;
+        }
+
+        @media (max-width: 768px) {
+            .title h1 {
+                font-size: 2.5em;
+            }
+            .music-player {
+                width: 90%;
+                min-width: unset;
+                padding: 20px;
+            }
+            .playlist {
+                right: 20px;
+                max-width: 200px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+    <div id="starLabel" class="star-label"></div>
+    
+    <div class="title">
+        <h1>GLITCHBOY</h1>
+        <p>///DISTORTED///</p>
+    </div>
+
+    <div class="playlist">
+        <h3>TRACKS</h3>
+        <div class="song-item active" data-song="0">
+            <div class="song-item-title">Stars Burn Out</div>
+            <div class="song-item-artist">CYKIM & JUSTIN</div>
+        </div>
+        <div class="song-item" data-song="1">
+            <div class="song-item-title">Supernova</div>
+            <div class="song-item-artist">aespa</div>
+        </div>
+        <div class="song-item" data-song="2">
+            <div class="song-item-title">Galaxy</div>
+            <div class="song-item-artist">JID</div>
+        </div>
+    </div>
+
+    <div class="music-player">
+        <div class="now-playing">
+            <h3>NOW PLAYING</h3>
+            <div class="song-title" id="currentTitle">STARS BURN OUT</div>
+            <div class="song-artist" id="currentArtist">CYKIM & JUSTIN</div>
+        </div>
+        <div id="youtubePlayer"></div>
+        <div class="player-controls">
+            <button class="control-btn" id="prevBtn">◄</button>
+            <button class="control-btn" id="playBtn">▶</button>
+            <button class="control-btn" id="nextBtn">►</button>
+        </div>
+        <div class="volume-control">
+            <label>VOL</label>
+            <input type="range" id="volume" min="0" max="100" value="50">
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStars();
+        });
+
+        const songs = [
+            { title: 'STARS BURN OUT', artist: 'CYKIM & JUSTIN' },
+            { title: 'SUPERNOVA', artist: 'aespa' },
+            { title: 'GALAXY', artist: 'JID' }
+        ];
+
+        let currentSong = 0;
+        let isPlaying = false;
+        const stars = [];
+        const shootingStars = [];
+        const starLabel = document.getElementById('starLabel');
+        let glitchTimer = 0;
+
+        class Star {
+            constructor(songIndex) {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.floor(Math.random() * 3) + 1;
+                this.brightness = Math.random();
+                this.twinkleSpeed = Math.random() * 0.03;
+                this.songIndex = songIndex;
+                this.hoverRadius = 25;
+                this.pixelated = Math.random() > 0.7;
+            }
+
+            draw() {
+                this.brightness += this.twinkleSpeed;
+                if (this.brightness > 1 || this.brightness < 0.2) {
+                    this.twinkleSpeed *= -1;
+                }
+                
+                const opacity = Math.floor(this.brightness * 255);
+                
+                if (this.pixelated) {
+                    ctx.fillStyle = `rgb(${opacity}, ${opacity}, ${opacity})`;
+                    ctx.fillRect(
+                        Math.floor(this.x / 2) * 2, 
+                        Math.floor(this.y / 2) * 2, 
+                        this.size * 2, 
+                        this.size * 2
+                    );
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgb(${opacity}, ${opacity}, ${opacity})`;
+                    ctx.fill();
+                }
+            }
+
+            isHovered(mouseX, mouseY) {
+                const dist = Math.sqrt((mouseX - this.x) ** 2 + (mouseY - this.y) ** 2);
+                return dist < this.hoverRadius;
+            }
+        }
+
+        class ShootingStar {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height / 2;
+                this.length = Math.random() * 60 + 30;
+                this.speed = Math.random() * 12 + 6;
+                this.angle = Math.PI / 4;
+                this.opacity = 1;
+            }
+
+            draw() {
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+                this.opacity -= 0.015;
+
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(
+                    this.x - Math.cos(this.angle) * this.length,
+                    this.y - Math.sin(this.angle) * this.length
+                );
+                ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            isGone() {
+                return this.opacity <= 0 || this.x > canvas.width || this.y > canvas.height;
+            }
+        }
+
+        function initStars() {
+            stars.length = 0;
+            const starsPerSong = 40;
+            for (let i = 0; i < songs.length; i++) {
+                for (let j = 0; j < starsPerSong; j++) {
+                    stars.push(new Star(i));
+                }
+            }
+        }
+
+        function drawGlitch() {
+            if (Math.random() > 0.98) {
+                const sliceY = Math.random() * canvas.height;
+                const sliceH = Math.random() * 50 + 10;
+                const offset = (Math.random() - 0.5) * 20;
+                
+                const imageData = ctx.getImageData(0, sliceY, canvas.width, sliceH);
+                ctx.putImageData(imageData, offset, sliceY);
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach(star => star.draw());
+
+            if (Math.random() < 0.008) {
+                shootingStars.push(new ShootingStar());
+            }
+
+            for (let i = shootingStars.length - 1; i >= 0; i--) {
+                shootingStars[i].draw();
+                if (shootingStars[i].isGone()) {
+                    shootingStars.splice(i, 1);
+                }
+            }
+
+            drawGlitch();
+
+            requestAnimationFrame(animate);
+        }
+
+        function updateNowPlaying() {
+            document.getElementById('currentTitle').textContent = songs[currentSong].title;
+            document.getElementById('currentArtist').textContent = songs[currentSong].artist;
+            
+            document.querySelectorAll('.song-item').forEach((item, index) => {
+                item.classList.toggle('active', index === currentSong);
+            });
+        }
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            let hoveredStar = null;
+            for (const star of stars) {
+                if (star.isHovered(mouseX, mouseY)) {
+                    hoveredStar = star;
+                    break;
+                }
+            }
+            
+            if (hoveredStar) {
+                starLabel.textContent = `${songs[hoveredStar.songIndex].title}`;
+                starLabel.style.left = e.clientX + 15 + 'px';
+                starLabel.style.top = e.clientY - 35 + 'px';
+                starLabel.style.opacity = '1';
+                canvas.style.cursor = 'pointer';
+            } else {
+                starLabel.style.opacity = '0';
+                canvas.style.cursor = 'default';
+            }
+        });
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            for (const star of stars) {
+                if (star.isHovered(mouseX, mouseY)) {
+                    currentSong = star.songIndex;
+                    updateNowPlaying();
+                    break;
+                }
+            }
+        });
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            document.getElementById('playBtn').textContent = isPlaying ? '■' : '▶';
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            currentSong = (currentSong - 1 + songs.length) % songs.length;
+            updateNowPlaying();
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            currentSong = (currentSong + 1) % songs.length;
+            updateNowPlaying();
+        });
+
+        document.querySelectorAll('.song-item').forEach((item, index) => {
+            item.addEventListener('click', () => {
+                currentSong = index;
+                updateNowPlaying();
+            });
+        });
+
+        const noiseEl = document.querySelector('.noise');
+        function animateNoise() {
+            noiseEl.style.backgroundImage = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='${Math.random() * 2}' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' /%3E%3C/svg%3E")`;
+            requestAnimationFrame(animateNoise);
+        }
+        animateNoise();
+
+        initStars();
+        animate();
+        updateNowPlaying();
+    </script>
+</body>
 </html>
