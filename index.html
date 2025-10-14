@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>glitchboy</title>
+    <title>Glitchboy</title>
     <style>
         * {
             margin: 0;
@@ -87,11 +87,15 @@
             letter-spacing: 12px;
             color: #fff;
             text-transform: uppercase;
-            animation: glitchText 2s infinite;
             position: relative;
             text-shadow: 
                 2px 2px 0px #000,
                 -2px -2px 0px #000;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            filter: contrast(1000%) brightness(1.5);
+            transform: scale(1.05);
         }
 
         @keyframes glitchText {
@@ -127,67 +131,67 @@
 
         .music-player {
             position: fixed;
-            bottom: 30px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
             background: #000;
-            border: 3px solid #fff;
-            padding: 25px 40px;
-            min-width: 400px;
+            border: 2px solid #fff;
+            padding: 15px 25px;
+            min-width: 320px;
             box-shadow: 
-                5px 5px 0px #fff,
-                10px 10px 0px #000,
-                10px 10px 0px #fff;
+                3px 3px 0px #fff,
+                6px 6px 0px #000,
+                6px 6px 0px #fff;
         }
 
         .now-playing {
             text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px dashed #fff;
-            padding-bottom: 15px;
+            margin-bottom: 12px;
+            border-bottom: 1px dashed #fff;
+            padding-bottom: 10px;
         }
 
         .now-playing h3 {
             color: #fff;
-            font-size: 0.8em;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
+            font-size: 0.7em;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
         }
 
         .song-title {
-            font-size: 1.2em;
+            font-size: 1em;
             color: #fff;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             font-weight: bold;
         }
 
         .song-artist {
-            font-size: 0.9em;
+            font-size: 0.75em;
             color: #888;
         }
 
         .player-controls {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 12px;
         }
 
         .control-btn {
             background: #fff;
             color: #000;
-            border: 3px solid #fff;
-            width: 50px;
-            height: 50px;
+            border: 2px solid #fff;
+            width: 35px;
+            height: 35px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.1s;
-            font-size: 1.2em;
+            font-size: 1em;
             font-weight: bold;
-            box-shadow: 3px 3px 0px #888;
+            box-shadow: 2px 2px 0px #888;
         }
 
         .control-btn:hover {
@@ -211,15 +215,15 @@
 
         .volume-control label {
             color: #fff;
-            font-size: 0.9em;
+            font-size: 0.75em;
             font-weight: bold;
         }
 
         input[type="range"] {
-            width: 200px;
-            height: 8px;
+            width: 150px;
+            height: 6px;
             background: #fff;
-            border: 2px solid #000;
+            border: 1px solid #000;
             outline: none;
             -webkit-appearance: none;
         }
@@ -227,19 +231,19 @@
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 14px;
+            height: 14px;
             background: #000;
-            border: 3px solid #fff;
+            border: 2px solid #fff;
             cursor: pointer;
-            box-shadow: 2px 2px 0px #888;
+            box-shadow: 1px 1px 0px #888;
         }
 
         input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
+            width: 14px;
+            height: 14px;
             background: #000;
-            border: 3px solid #fff;
+            border: 2px solid #fff;
             cursor: pointer;
         }
 
@@ -280,25 +284,25 @@
         .song-item:hover {
             background: #fff;
             color: #000;
-            transform: translate(3px, 3px);
+            transform: translate(2px, 2px);
         }
 
         .song-item.active {
             background: #fff;
             color: #000;
-            border: 2px solid #000;
-            box-shadow: inset 3px 3px 0px #888;
+            border: 1px solid #000;
+            box-shadow: inset 2px 2px 0px #888;
         }
 
         .song-item-title {
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             text-transform: uppercase;
-            font-size: 0.85em;
+            font-size: 0.7em;
         }
 
         .song-item-artist {
-            font-size: 0.75em;
+            font-size: 0.65em;
             opacity: 0.7;
         }
 
@@ -306,16 +310,16 @@
             position: absolute;
             background: #fff;
             color: #000;
-            padding: 8px 12px;
-            font-size: 0.75em;
+            padding: 5px 8px;
+            font-size: 0.65em;
             font-weight: bold;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.1s;
             z-index: 5;
-            border: 2px solid #000;
+            border: 1px solid #000;
             text-transform: uppercase;
-            box-shadow: 3px 3px 0px #000;
+            box-shadow: 2px 2px 0px #000;
         }
 
         @media (max-width: 768px) {
@@ -343,7 +347,6 @@
     
     <div class="title">
         <h1>GLITCHBOY</h1>
-        <p>///DISTORTED///</p>
     </div>
 
     <div class="playlist">
@@ -359,6 +362,14 @@
         <div class="song-item" data-song="2">
             <div class="song-item-title">Galaxy</div>
             <div class="song-item-artist">JID</div>
+        </div>
+        <div class="song-item" data-song="3">
+            <div class="song-item-title">Gửi Về Trái Đất Xa Xôi</div>
+            <div class="song-item-artist">Dấu Vân Tay</div>
+        </div>
+        <div class="song-item" data-song="4">
+            <div class="song-item-title">Daggers</div>
+            <div class="song-item-artist">Kali Uchis</div>
         </div>
     </div>
 
@@ -394,52 +405,122 @@
         });
 
         const songs = [
-            { title: 'STARS BURN OUT', artist: 'CYKIM & JUSTIN' },
-            { title: 'SUPERNOVA', artist: 'aespa' },
-            { title: 'GALAXY', artist: 'JID' }
+            { title: 'STARS BURN OUT', artist: 'CYKIM & JUSTIN', videoId: 'hcfvx04szGA', constellation: 'Orion' },
+            { title: 'SUPERNOVA', artist: 'aespa', videoId: 'phuiiNCxRMg', constellation: 'Cassiopeia' },
+            { title: 'GALAXY', artist: 'JID', videoId: '1lgy5Mb6QKx47vJXmmwIri', constellation: 'Big Dipper' },
+            { title: 'GỬI VỀ TRÁI ĐẤT XA XÔI', artist: 'Dấu Vân Tay', videoId: 'kV2SS40WJ7I', constellation: 'Leo' },
+            { title: 'DAGGERS', artist: 'Kali Uchis', videoId: 'y0VWg_F87NU', constellation: 'Scorpius' }
+        ];
+
+        const constellations = [
+            // Orion - Stars Burn Out
+            [
+                {x: 0.20, y: 0.25}, {x: 0.24, y: 0.22}, {x: 0.28, y: 0.25},
+                {x: 0.22, y: 0.32}, {x: 0.24, y: 0.35}, {x: 0.26, y: 0.32},
+                {x: 0.24, y: 0.40}, {x: 0.22, y: 0.45}, {x: 0.26, y: 0.45}
+            ],
+            // Cassiopeia - Supernova (W shape)
+            [
+                {x: 0.45, y: 0.18}, {x: 0.50, y: 0.22}, {x: 0.55, y: 0.18},
+                {x: 0.60, y: 0.22}, {x: 0.65, y: 0.18}
+            ],
+            // Big Dipper - Galaxy
+            [
+                {x: 0.70, y: 0.25}, {x: 0.74, y: 0.28}, {x: 0.78, y: 0.30},
+                {x: 0.82, y: 0.32}, {x: 0.80, y: 0.38}, {x: 0.76, y: 0.40},
+                {x: 0.72, y: 0.38}
+            ],
+            // Leo - Gửi Về Trái Đất
+            [
+                {x: 0.25, y: 0.60}, {x: 0.30, y: 0.58}, {x: 0.35, y: 0.60},
+                {x: 0.38, y: 0.65}, {x: 0.35, y: 0.70}, {x: 0.30, y: 0.68},
+                {x: 0.28, y: 0.63}
+            ],
+            // Scorpius - Daggers (curved tail)
+            [
+                {x: 0.60, y: 0.65}, {x: 0.64, y: 0.63}, {x: 0.68, y: 0.65},
+                {x: 0.70, y: 0.68}, {x: 0.72, y: 0.72}, {x: 0.75, y: 0.75},
+                {x: 0.78, y: 0.72}, {x: 0.80, y: 0.68}
+            ]
         ];
 
         let currentSong = 0;
         let isPlaying = false;
+        let player;
         const stars = [];
+        const backgroundStars = [];
         const shootingStars = [];
         const starLabel = document.getElementById('starLabel');
         let glitchTimer = 0;
 
-        class Star {
-            constructor(songIndex) {
+        class BackgroundStar {
+            constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.floor(Math.random() * 3) + 1;
+                this.size = Math.floor(Math.random() * 2) + 1;
+                this.brightness = Math.random() * 0.5 + 0.3;
+                this.twinkleSpeed = Math.random() * 0.02;
+                this.driftX = (Math.random() - 0.5) * 0.1;
+                this.driftY = (Math.random() - 0.5) * 0.1;
+            }
+
+            update() {
+                // Twinkling animation
+                this.brightness += this.twinkleSpeed;
+                if (this.brightness > 0.8 || this.brightness < 0.2) {
+                    this.twinkleSpeed *= -1;
+                }
+                
+                // Drifting animation
+                this.x += this.driftX;
+                this.y += this.driftY;
+                
+                // Wrap around screen
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+
+            draw() {
+                const opacity = Math.floor(this.brightness * 255);
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgb(${opacity}, ${opacity}, ${opacity})`;
+                ctx.fill();
+            }
+        }
+
+        class Star {
+            constructor(songIndex, posX, posY) {
+                this.x = posX;
+                this.y = posY;
+                this.size = 4;
                 this.brightness = Math.random();
                 this.twinkleSpeed = Math.random() * 0.03;
                 this.songIndex = songIndex;
-                this.hoverRadius = 25;
-                this.pixelated = Math.random() > 0.7;
+                this.hoverRadius = 30;
             }
 
             draw() {
                 this.brightness += this.twinkleSpeed;
-                if (this.brightness > 1 || this.brightness < 0.2) {
+                if (this.brightness > 1 || this.brightness < 0.5) {
                     this.twinkleSpeed *= -1;
                 }
                 
                 const opacity = Math.floor(this.brightness * 255);
                 
-                if (this.pixelated) {
-                    ctx.fillStyle = `rgb(${opacity}, ${opacity}, ${opacity})`;
-                    ctx.fillRect(
-                        Math.floor(this.x / 2) * 2, 
-                        Math.floor(this.y / 2) * 2, 
-                        this.size * 2, 
-                        this.size * 2
-                    );
-                } else {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgb(${opacity}, ${opacity}, ${opacity})`;
-                    ctx.fill();
-                }
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgb(${opacity}, ${opacity}, ${opacity})`;
+                ctx.fill();
+                
+                // Glow effect
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'white';
+                ctx.fill();
+                ctx.shadowBlur = 0;
             }
 
             isHovered(mouseX, mouseY) {
@@ -481,12 +562,45 @@
 
         function initStars() {
             stars.length = 0;
-            const starsPerSong = 40;
-            for (let i = 0; i < songs.length; i++) {
-                for (let j = 0; j < starsPerSong; j++) {
-                    stars.push(new Star(i));
+            backgroundStars.length = 0;
+            
+            // Create many more background stars
+            for (let i = 0; i < 300; i++) {
+                backgroundStars.push(new BackgroundStar());
+            }
+            
+            // Create constellation stars for each song
+            for (let i = 0; i < constellations.length; i++) {
+                const constellation = constellations[i];
+                for (let j = 0; j < constellation.length; j++) {
+                    const posX = constellation[j].x * canvas.width;
+                    const posY = constellation[j].y * canvas.height;
+                    stars.push(new Star(i, posX, posY));
                 }
             }
+        }
+
+        function drawConstellation(songIndex) {
+            const constellation = constellations[songIndex];
+            if (!constellation) return;
+
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+
+            for (let i = 0; i < constellation.length; i++) {
+                const x = constellation[i].x * canvas.width;
+                const y = constellation[i].y * canvas.height;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
         }
 
         function drawGlitch() {
@@ -504,6 +618,16 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Update and draw background stars with animation
+            backgroundStars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+
+            // Draw constellation lines for current song
+            drawConstellation(currentSong);
+
+            // Draw constellation stars
             stars.forEach(star => star.draw());
 
             if (Math.random() < 0.008) {
@@ -545,7 +669,7 @@
             }
             
             if (hoveredStar) {
-                starLabel.textContent = `${songs[hoveredStar.songIndex].title}`;
+                starLabel.textContent = `${songs[hoveredStar.songIndex].constellation}: ${songs[hoveredStar.songIndex].title}`;
                 starLabel.style.left = e.clientX + 15 + 'px';
                 starLabel.style.top = e.clientY - 35 + 'px';
                 starLabel.style.opacity = '1';
@@ -565,31 +689,107 @@
                 if (star.isHovered(mouseX, mouseY)) {
                     currentSong = star.songIndex;
                     updateNowPlaying();
+                    if (player && player.loadVideoById) {
+                        player.loadVideoById(songs[currentSong].videoId);
+                        player.playVideo();
+                        isPlaying = true;
+                        document.getElementById('playBtn').textContent = '■';
+                    }
                     break;
                 }
             }
         });
 
+        // YouTube API
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtubePlayer', {
+                height: '0',
+                width: '0',
+                videoId: songs[0].videoId,
+                playerVars: {
+                    'playsinline': 1,
+                    'controls': 0
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            document.getElementById('volume').value = 50;
+            event.target.setVolume(50);
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.ENDED) {
+                currentSong = (currentSong + 1) % songs.length;
+                updateNowPlaying();
+                player.loadVideoById(songs[currentSong].videoId);
+                player.playVideo();
+            }
+            if (event.data == YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                document.getElementById('playBtn').textContent = '■';
+            } else if (event.data == YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                document.getElementById('playBtn').textContent = '▶';
+            }
+        }
+
+        window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+
         document.getElementById('playBtn').addEventListener('click', () => {
-            isPlaying = !isPlaying;
-            document.getElementById('playBtn').textContent = isPlaying ? '■' : '▶';
+            if (!player || !player.playVideo) return;
+            
+            if (isPlaying) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
         });
 
         document.getElementById('prevBtn').addEventListener('click', () => {
             currentSong = (currentSong - 1 + songs.length) % songs.length;
             updateNowPlaying();
+            if (player && player.loadVideoById) {
+                player.loadVideoById(songs[currentSong].videoId);
+                if (isPlaying) player.playVideo();
+            }
         });
 
         document.getElementById('nextBtn').addEventListener('click', () => {
             currentSong = (currentSong + 1) % songs.length;
             updateNowPlaying();
+            if (player && player.loadVideoById) {
+                player.loadVideoById(songs[currentSong].videoId);
+                if (isPlaying) player.playVideo();
+            }
         });
 
         document.querySelectorAll('.song-item').forEach((item, index) => {
             item.addEventListener('click', () => {
                 currentSong = index;
                 updateNowPlaying();
+                if (player && player.loadVideoById) {
+                    player.loadVideoById(songs[currentSong].videoId);
+                    player.playVideo();
+                    isPlaying = true;
+                    document.getElementById('playBtn').textContent = '■';
+                }
             });
+        });
+
+        document.getElementById('volume').addEventListener('input', (e) => {
+            if (player && player.setVolume) {
+                player.setVolume(e.target.value);
+            }
         });
 
         const noiseEl = document.querySelector('.noise');
