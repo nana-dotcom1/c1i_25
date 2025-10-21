@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glitchboy</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -12,7 +14,7 @@
         }
 
         body {
-            font-family: 'Courier New', monospace;
+            font-family: 'Press Start 2P', cursive;
             background: #000;
             color: #fff;
             overflow: hidden;
@@ -356,8 +358,8 @@
             <div class="song-item-artist">CYKIM & JUSTIN</div>
         </div>
         <div class="song-item" data-song="1">
-            <div class="song-item-title">Supernova</div>
-            <div class="song-item-artist">aespa</div>
+            <div class="song-item-title">Perfect</div>
+            <div class="song-item-artist">shiki</div>
         </div>
         <div class="song-item" data-song="2">
             <div class="song-item-title">Galaxy</div>
@@ -370,6 +372,10 @@
         <div class="song-item" data-song="4">
             <div class="song-item-title">Daggers</div>
             <div class="song-item-artist">Kali Uchis</div>
+        </div>
+        <div class="song-item" data-song="5">
+            <div class="song-item-title">All I Can Say</div>
+            <div class="song-item-artist">kenji</div>
         </div>
     </div>
 
@@ -406,10 +412,11 @@
 
         const songs = [
             { title: 'STARS BURN OUT', artist: 'CYKIM & JUSTIN', videoId: 'hcfvx04szGA', constellation: 'Orion' },
-            { title: 'SUPERNOVA', artist: 'aespa', videoId: 'phuiiNCxRMg', constellation: 'Cassiopeia' },
+            { title: 'PERFECT', artist: 'shiki', videoId: 'U1usrHw-GvI', constellation: 'Cassiopeia' },
             { title: 'GALAXY', artist: 'JID', videoId: 'IUE5m6vfCAg', constellation: 'Big Dipper' },
             { title: 'GỬI VỀ TRÁI ĐẤT XA XÔI', artist: 'Dấu Vân Tay', videoId: 'vXn-yQwXShE', constellation: 'Leo' },
-            { title: 'DAGGERS', artist: 'Kali Uchis', videoId: '4omO2Zwxhuw', constellation: 'Scorpius' }
+            { title: 'DAGGERS', artist: 'Kali Uchis', videoId: '4omO2Zwxhuw', constellation: 'Scorpius' },
+            { title: 'ALL I CAN SAY', artist: 'kenji', videoId: 'obBXhTwFsKQ', constellation: 'Lyra' }
         ];
 
         const constellations = [
@@ -419,7 +426,7 @@
                 {x: 0.22, y: 0.32}, {x: 0.24, y: 0.35}, {x: 0.26, y: 0.32},
                 {x: 0.24, y: 0.40}, {x: 0.22, y: 0.45}, {x: 0.26, y: 0.45}
             ],
-            // Cassiopeia - Supernova (W shape)
+            // Cassiopeia - Perfect (W shape)
             [
                 {x: 0.45, y: 0.18}, {x: 0.50, y: 0.22}, {x: 0.55, y: 0.18},
                 {x: 0.60, y: 0.22}, {x: 0.65, y: 0.18}
@@ -441,6 +448,11 @@
                 {x: 0.60, y: 0.65}, {x: 0.64, y: 0.63}, {x: 0.68, y: 0.65},
                 {x: 0.70, y: 0.68}, {x: 0.72, y: 0.72}, {x: 0.75, y: 0.75},
                 {x: 0.78, y: 0.72}, {x: 0.80, y: 0.68}
+            ],
+            // Lyra - All I Can Say (harp shape)
+            [
+                {x: 0.15, y: 0.50}, {x: 0.18, y: 0.48}, {x: 0.21, y: 0.50},
+                {x: 0.19, y: 0.53}, {x: 0.17, y: 0.56}
             ]
         ];
 
