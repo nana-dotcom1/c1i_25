@@ -133,67 +133,67 @@
 
         .music-player {
             position: fixed;
-            bottom: 20px;
+            bottom: 15px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
             background: #000;
             border: 2px solid #fff;
-            padding: 15px 25px;
-            min-width: 320px;
+            padding: 8px 15px;
+            min-width: 220px;
             box-shadow: 
-                3px 3px 0px #fff,
-                6px 6px 0px #000,
-                6px 6px 0px #fff;
+                2px 2px 0px #fff,
+                4px 4px 0px #000,
+                4px 4px 0px #fff;
         }
 
         .now-playing {
             text-align: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             border-bottom: 1px dashed #fff;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
 
         .now-playing h3 {
             color: #fff;
-            font-size: 0.7em;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
+            font-size: 0.5em;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
         }
 
         .song-title {
-            font-size: 1em;
+            font-size: 0.7em;
             color: #fff;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             font-weight: bold;
         }
 
         .song-artist {
-            font-size: 0.75em;
+            font-size: 0.55em;
             color: #888;
         }
 
         .player-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 6px;
+            margin-bottom: 8px;
         }
 
         .control-btn {
             background: #fff;
             color: #000;
             border: 2px solid #fff;
-            width: 35px;
-            height: 35px;
+            width: 22px;
+            height: 22px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.1s;
-            font-size: 1em;
+            font-size: 0.6em;
             font-weight: bold;
-            box-shadow: 2px 2px 0px #888;
+            box-shadow: 1px 1px 0px #888;
         }
 
         .control-btn:hover {
@@ -211,19 +211,19 @@
         .volume-control {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             justify-content: center;
         }
 
         .volume-control label {
             color: #fff;
-            font-size: 0.75em;
+            font-size: 0.6em;
             font-weight: bold;
         }
 
         input[type="range"] {
-            width: 150px;
-            height: 6px;
+            width: 100px;
+            height: 5px;
             background: #fff;
             border: 1px solid #000;
             outline: none;
@@ -233,8 +233,8 @@
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             background: #000;
             border: 2px solid #fff;
             cursor: pointer;
@@ -242,8 +242,8 @@
         }
 
         input[type="range"]::-moz-range-thumb {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             background: #000;
             border: 2px solid #fff;
             cursor: pointer;
@@ -377,6 +377,14 @@
             <div class="song-item-title">All I Can Say</div>
             <div class="song-item-artist">kenji</div>
         </div>
+        <div class="song-item" data-song="6">
+            <div class="song-item-title">Ocean Tide</div>
+            <div class="song-item-artist">CYKIM & JUSTIN</div>
+        </div>
+        <div class="song-item" data-song="7">
+            <div class="song-item-title">Tejano Blue</div>
+            <div class="song-item-artist">Cigarettes After Sex</div>
+        </div>
     </div>
 
     <div class="music-player">
@@ -416,7 +424,9 @@
             { title: 'GALAXY', artist: 'JID', videoId: 'IUE5m6vfCAg', constellation: 'Big Dipper' },
             { title: 'GỬI VỀ TRÁI ĐẤT XA XÔI', artist: 'Dấu Vân Tay', videoId: 'vXn-yQwXShE', constellation: 'Leo' },
             { title: 'DAGGERS', artist: 'Kali Uchis', videoId: '4omO2Zwxhuw', constellation: 'Scorpius' },
-            { title: 'ALL I CAN SAY', artist: 'kenji', videoId: 'obBXhTwFsKQ', constellation: 'Lyra' }
+            { title: 'ALL I CAN SAY', artist: 'kenji', videoId: 'obBXhTwFsKQ', constellation: 'Lyra' },
+            { title: 'OCEAN TIDE', artist: 'CYKIM & JUSTIN', videoId: 'Dbv3JNfF2Bg', constellation: 'Aquarius' },
+            { title: 'TEJANO BLUE', artist: 'Cigarettes After Sex', videoId: '--JuMkludKM', constellation: 'Cygnus' }
         ];
 
         const constellations = [
@@ -453,6 +463,18 @@
             [
                 {x: 0.15, y: 0.50}, {x: 0.18, y: 0.48}, {x: 0.21, y: 0.50},
                 {x: 0.19, y: 0.53}, {x: 0.17, y: 0.56}
+            ],
+            // Aquarius - Ocean Tide (water bearer)
+            [
+                {x: 0.50, y: 0.70}, {x: 0.53, y: 0.68}, {x: 0.56, y: 0.70},
+                {x: 0.54, y: 0.73}, {x: 0.52, y: 0.76}, {x: 0.55, y: 0.78},
+                {x: 0.58, y: 0.76}
+            ],
+            // Cygnus - Tejano Blue (swan/cross shape)
+            [
+                {x: 0.40, y: 0.35}, {x: 0.43, y: 0.33}, {x: 0.46, y: 0.35},
+                {x: 0.43, y: 0.38}, {x: 0.43, y: 0.42}, {x: 0.40, y: 0.40},
+                {x: 0.46, y: 0.40}
             ]
         ];
 
@@ -713,33 +735,39 @@
         });
 
         // YouTube API
+        let apiReady = false;
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        function onYouTubeIframeAPIReady() {
+        window.onYouTubeIframeAPIReady = function() {
+            apiReady = true;
             player = new YT.Player('youtubePlayer', {
                 height: '0',
                 width: '0',
                 videoId: songs[0].videoId,
                 playerVars: {
                     'playsinline': 1,
-                    'controls': 0
+                    'controls': 0,
+                    'autoplay': 0,
+                    'enablejsapi': 1
                 },
                 events: {
                     'onReady': onPlayerReady,
                     'onStateChange': onPlayerStateChange
                 }
             });
-        }
+        };
 
         function onPlayerReady(event) {
+            console.log('YouTube player ready');
             document.getElementById('volume').value = 50;
             event.target.setVolume(50);
         }
 
         function onPlayerStateChange(event) {
+            console.log('Player state:', event.data);
             if (event.data == YT.PlayerState.ENDED) {
                 currentSong = (currentSong + 1) % songs.length;
                 updateNowPlaying();
@@ -755,11 +783,13 @@
             }
         }
 
-        window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
-
         document.getElementById('playBtn').addEventListener('click', () => {
-            if (!player || !player.playVideo) return;
+            if (!player || !player.playVideo) {
+                console.log('Player not ready yet');
+                return;
+            }
             
+            console.log('Play button clicked, isPlaying:', isPlaying);
             if (isPlaying) {
                 player.pauseVideo();
             } else {
