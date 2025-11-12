@@ -298,14 +298,16 @@
 
         .song-item-title {
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             text-transform: uppercase;
-            font-size: 0.7em;
+            font-size: 0.5em;
+            line-height: 1.3;
         }
 
         .song-item-artist {
-            font-size: 0.65em;
+            font-size: 0.45em;
             opacity: 0.7;
+            line-height: 1.3;
         }
 
         .star-label {
@@ -385,6 +387,10 @@
             <div class="song-item-title">Tejano Blue</div>
             <div class="song-item-artist">Cigarettes After Sex</div>
         </div>
+        <div class="song-item" data-song="8">
+            <div class="song-item-title">Moon</div>
+            <div class="song-item-artist">Daniel Caesar, Bon Iver</div>
+        </div>
     </div>
 
     <div class="music-player">
@@ -426,7 +432,8 @@
             { title: 'DAGGERS', artist: 'Kali Uchis', videoId: '4omO2Zwxhuw', constellation: 'Scorpius' },
             { title: 'ALL I CAN SAY', artist: 'kenji', videoId: 'obBXhTwFsKQ', constellation: 'Lyra' },
             { title: 'OCEAN TIDE', artist: 'CYKIM & JUSTIN', videoId: 'Dbv3JNfF2Bg', constellation: 'Aquarius' },
-            { title: 'TEJANO BLUE', artist: 'Cigarettes After Sex', videoId: '--JuMkludKM', constellation: 'Cygnus' }
+            { title: 'TEJANO BLUE', artist: 'Cigarettes After Sex', videoId: '--JuMkludKM', constellation: 'Cygnus' },
+            { title: 'MOON', artist: 'Daniel Caesar, Bon Iver', videoId: 'Cz4arkvTXfE', constellation: 'Cancer' }
         ];
 
         const constellations = [
@@ -475,6 +482,11 @@
                 {x: 0.40, y: 0.35}, {x: 0.43, y: 0.33}, {x: 0.46, y: 0.35},
                 {x: 0.43, y: 0.38}, {x: 0.43, y: 0.42}, {x: 0.40, y: 0.40},
                 {x: 0.46, y: 0.40}
+            ],
+            // Cancer - Moon (crab shape)
+            [
+                {x: 0.35, y: 0.45}, {x: 0.38, y: 0.43}, {x: 0.41, y: 0.45},
+                {x: 0.39, y: 0.48}, {x: 0.37, y: 0.50}, {x: 0.40, y: 0.50}
             ]
         ];
 
