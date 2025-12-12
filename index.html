@@ -1,521 +1,862 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GLITCHBOY — playlist + visualizer / mini-game</title>
-  <style>
-    :root{
-      --bg:#0b0b0d; --card:#0f1114; --accent:#9fd6ff; --muted:#bfc5cf; --pink:#f0c9e8; --lilac:#d9ccff; --yellow:#ffd76a; --glass: rgba(255,255,255,0.04);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#040405 0%, #0b0b0d 60%);color:var(--muted);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px}
-    .app{width:100%;max-width:1100px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:16px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-    header{display:flex;align-items:center;gap:18px}
-    .logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,var(--lilac),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:800;color:#040405;font-size:20px}
-    h1{margin:0;font-size:22px;color:white}
-    p.lead{margin:0;color:var(--muted);font-size:13px}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glitchboy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-    .main{display:grid;grid-template-columns:360px 1fr;gap:20px;margin-top:18px}
-    .playlist{background:var(--card);padding:12px;border-radius:12px}
-    ul{list-style:none;padding:0;margin:0}
-    li.song{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;cursor:pointer;margin-bottom:6px;background:transparent}
-    li.song:hover{background:var(--glass)}
-    .meta{display:flex;gap:8px;align-items:center}
-    .artist{font-size:13px;color:var(--muted)}
-    .title{font-weight:700;color:white}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .controls{background:var(--card);padding:14px;border-radius:12px;display:flex;align-items:center;gap:12px}
-    .bigplay{width:56px;height:56px;border-radius:10px;background:linear-gradient(180deg,var(--accent),var(--lilac));display:flex;align-items:center;justify-content:center;font-size:20px;color:#040405;border:none;cursor:pointer}
-    .small{display:flex;flex-direction:column}
-    .nowplaying{font-weight:700;color:white}
-    .sub{font-size:13px;color:var(--muted)}
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
 
-    .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter: blur(6px);z-index:999}
-    .overlay.open{display:flex}
-    .popup{width:100%;max-width:1100px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:12px;padding:18px;display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
-    canvas{width:100%;height:420px;background:linear-gradient(180deg,#050507,#0c0c0f);border-radius:10px;display:block}
-    .side{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px}
-    .close{background:transparent;border:none;color:var(--muted);font-size:18px;cursor:pointer}
-    .toggle{display:flex;gap:8px;margin-top:8px}
-    .btn{background:linear-gradient(180deg,#121216,#0b0b0d);border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:8px;color:var(--muted);cursor:pointer}
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
 
-    footer{margin-top:14px;color:var(--muted);font-size:13px;text-align:center}
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+        }
 
-    @media (max-width:900px){.main{grid-template-columns:1fr}.popup{grid-template-columns:1fr}.canvas{height:300px}}
+        .title {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+        }
 
-    /* subtle accessibility focus */
-    li.song:focus{outline:2px solid rgba(159,214,255,0.18)}
-  </style>
+        .title h1 {
+            font-size: 4.5em;
+            font-weight: 900;
+            letter-spacing: 12px;
+            color: #fff;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0px #000, -2px -2px 0px #000;
+        }
+
+        .music-player {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: #000;
+            border: 2px solid #fff;
+            padding: 8px 15px;
+            min-width: 220px;
+            box-shadow: 2px 2px 0px #fff, 4px 4px 0px #000, 4px 4px 0px #fff;
+        }
+
+        .now-playing {
+            text-align: center;
+            margin-bottom: 8px;
+            border-bottom: 1px dashed #fff;
+            padding-bottom: 8px;
+        }
+
+        .now-playing h3 {
+            font-size: 0.5em;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .song-title {
+            font-size: 0.7em;
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+
+        .song-artist {
+            font-size: 0.55em;
+            color: #888;
+        }
+
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .control-btn {
+            background: #fff;
+            color: #000;
+            border: 2px solid #fff;
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6em;
+            font-weight: bold;
+        }
+
+        .control-btn:hover {
+            background: #000;
+            color: #fff;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .volume-control label {
+            font-size: 0.6em;
+        }
+
+        input[type="range"] {
+            width: 100px;
+            height: 5px;
+            background: #fff;
+            border: 1px solid #000;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #000;
+            border: 2px solid #fff;
+            cursor: pointer;
+        }
+
+        .playlist {
+            position: fixed;
+            top: 50%;
+            right: -140px;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: #000;
+            border: 2px solid #fff;
+            padding: 8px;
+            max-width: 160px;
+            max-height: 350px;
+            overflow-y: auto;
+            transition: right 0.3s ease;
+        }
+
+        .playlist:hover {
+            right: 20px;
+        }
+
+        .playlist::before {
+            content: 'TRACKS';
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            background: #000;
+            border: 2px solid #fff;
+            padding: 5px 10px;
+            font-size: 0.5em;
+            letter-spacing: 2px;
+        }
+
+        .playlist h3 {
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-align: center;
+            border-bottom: 1px solid #fff;
+            padding-bottom: 6px;
+            font-size: 0.5em;
+        }
+
+        .song-item {
+            margin: 6px 0;
+            padding: 6px;
+            cursor: pointer;
+            background: #000;
+            border: 1px solid #fff;
+        }
+
+        .song-item:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .song-item.active {
+            background: #fff;
+            color: #000;
+        }
+
+        .song-item-title {
+            font-weight: bold;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            font-size: 0.5em;
+            line-height: 1.3;
+        }
+
+        .song-item-artist {
+            font-size: 0.45em;
+            opacity: 0.7;
+            line-height: 1.3;
+        }
+
+        .star-label {
+            position: absolute;
+            background: #fff;
+            color: #000;
+            padding: 5px 8px;
+            font-size: 0.65em;
+            font-weight: bold;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.1s;
+            z-index: 5;
+            border: 1px solid #000;
+            text-transform: uppercase;
+        }
+
+        .song-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .song-popup.active {
+            display: flex;
+        }
+
+        .popup-content {
+            background: #000;
+            border: 3px solid #fff;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 5px 5px 0px #fff;
+            position: relative;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #fff;
+            color: #000;
+            border: none;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .popup-close:hover {
+            background: #000;
+            color: #fff;
+            border: 2px solid #fff;
+        }
+
+        .popup-title {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .popup-artist {
+            font-size: 0.6em;
+            color: #888;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .popup-canvas {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #fff;
+            background: #000;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .popup-constellation {
+            font-size: 0.5em;
+            text-align: center;
+            margin-top: 15px;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
-  <div class="app" role="application">
-    <header>
-      <div class="logo">GB</div>
-      <div>
-        <h1>glitchboy</h1>
-        <p class="lead">playlist prototype — click a track to open visualizer or mini-game</p>
-      </div>
-    </header>
-
-    <div class="main">
-      <aside class="playlist" aria-label="playlist">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <strong style="color:white">tracks</strong>
-          <div style="display:flex;gap:8px;align-items:center">
-            <label class="btn" for="file">add local</label>
-            <input id="file" type="file" accept="audio/*" style="display:none">
-            <button id="demo" class="btn">demo (osc)</button>
-          </div>
+    <canvas id="canvas"></canvas>
+    <div class="scanlines"></div>
+    <div id="starLabel" class="star-label"></div>
+    
+    <div id="songPopup" class="song-popup">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup()">×</button>
+            <div class="popup-title" id="popupTitle"></div>
+            <div class="popup-artist" id="popupArtist"></div>
+            <div id="popupCanvas" class="popup-canvas"></div>
+            <div class="popup-constellation" id="popupConstellation"></div>
         </div>
-        <ul id="tracklist">
-          <!-- example list; replace data-audio with your hosted mp3 URLs or drop local files -->
-          <li tabindex="0" class="song" data-audio="audio/starsburnout.mp3" data-artist="CYKIM & JUSTIN" data-viz="bars" data-game="falling-nodes"><div><div class="title">Stars Burn Out</div><div class="artist">CYKIM & JUSTIN</div></div><div class="meta">▶</div></li>
-          <li tabindex="0" class="song" data-audio="audio/perfect.mp3" data-artist="shiki" data-viz="circle" data-game="click-waves"><div><div class="title">Perfect</div><div class="artist">shiki</div></div><div class="meta">▶</div></li>
-          <li tabindex="0" class="song" data-audio="audio/galaxy.mp3" data-artist="JID" data-viz="orbit" data-game="shatter"><div><div class="title">Galaxy</div><div class="artist">JID</div></div><div class="meta">▶</div></li>
-          <li tabindex="0" class="song" data-audio="audio/daggers.mp3" data-artist="Kali Uchis" data-viz="pulse" data-game="slice"><div><div class="title">Daggers</div><div class="artist">Kali Uchis</div></div><div class="meta">▶</div></li>
-        </ul>
-      </aside>
-
-      <section>
-        <div class="controls">
-          <button id="openFirst" class="bigplay" title="open first track">▶</button>
-          <div class="small">
-            <div class="nowplaying" id="nowTitle">no track</div>
-            <div class="sub" id="nowArtist">—</div>
-          </div>
-          <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-            <label class="sub">volume</label>
-            <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8">
-          </div>
-        </div>
-
-        <div style="height:18px"></div>
-
-        <div style="background:var(--card);padding:14px;border-radius:12px">
-          <strong style="color:white">instructions</strong>
-          <p style="margin:8px 0 0 0;color:var(--muted);font-size:13px">click a track to open a full-screen overlay. toggle between visualizer and mini-game. you can also drop a local audio file or use the demo oscillator if you only want visuals.</p>
-        </div>
-
-        <footer>built for your portfolio — deploy by replacing this file on GitHub Pages</footer>
-      </section>
     </div>
-  </div>
-
-  <!-- overlay popup -->
-  <div id="overlay" class="overlay" aria-hidden="true">
-    <div class="popup" role="dialog" aria-modal="true">
-      <div>
-        <canvas id="visualizerCanvas'></canvas>
-      </div>
-      <div class="side">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <div id="popupTitle" style="font-weight:700;color:white">no track</div>
-            <div id="popupArtist" style="font-size:13px;color:var(--muted)"></div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-            <button id="closePopup" class="close" title="close">✕</button>
-            <button id="pauseBtn" class="btn">pause</button>
-          </div>
-        </div>
-
-        <div class="toggle">
-          <button id="modeViz" class="btn">visualizer</button>
-          <button id="modeGame" class="btn">mini-game</button>
-        </div>
-
-        <div style="margin-top:12px">
-          <label class="sub">progress</label>
-          <input id="seek" type="range" min="0" max="1" step="0.001" value="0" style="width:100%">
-        </div>
-
-        <div style="margin-top:12px">
-          <button id="downloadBtn" class="btn">download (current track)</button>
-        </div>
-
-        <p style="margin-top:14px;color:var(--muted);font-size:13px">tips: try game mode and click the falling nodes. speed reacts to the music intensity.</p>
-      </div>
+    
+    <div class="title">
+        <h1>GLITCHBOY</h1>
     </div>
-  </div>
 
-  <script>
-    // small helper utilities
-    const $ = sel => document.querySelector(sel);
-    const $$ = sel => Array.from(document.querySelectorAll(sel));
+    <div class="playlist">
+        <h3>TRACKS</h3>
+        <div class="song-item active" data-song="0">
+            <div class="song-item-title">Stars Burn Out</div>
+            <div class="song-item-artist">CYKIM & JUSTIN</div>
+        </div>
+        <div class="song-item" data-song="1">
+            <div class="song-item-title">Perfect</div>
+            <div class="song-item-artist">shiki</div>
+        </div>
+        <div class="song-item" data-song="2">
+            <div class="song-item-title">Galaxy</div>
+            <div class="song-item-artist">JID</div>
+        </div>
+        <div class="song-item" data-song="3">
+            <div class="song-item-title">Gửi Về Trái Đất Xa Xôi</div>
+            <div class="song-item-artist">Dấu Vân Tay</div>
+        </div>
+        <div class="song-item" data-song="4">
+            <div class="song-item-title">Daggers</div>
+            <div class="song-item-artist">Kali Uchis</div>
+        </div>
+        <div class="song-item" data-song="5">
+            <div class="song-item-title">All I Can Say</div>
+            <div class="song-item-artist">kenji</div>
+        </div>
+        <div class="song-item" data-song="6">
+            <div class="song-item-title">Ocean Tide</div>
+            <div class="song-item-artist">CYKIM & JUSTIN</div>
+        </div>
+        <div class="song-item" data-song="7">
+            <div class="song-item-title">Tejano Blue</div>
+            <div class="song-item-artist">Cigarettes After Sex</div>
+        </div>
+        <div class="song-item" data-song="8">
+            <div class="song-item-title">Moon</div>
+            <div class="song-item-artist">Daniel Caesar, Bon Iver</div>
+        </div>
+        <div class="song-item" data-song="9">
+            <div class="song-item-title">Saturn</div>
+            <div class="song-item-artist">SZA</div>
+        </div>
+    </div>
 
-    const overlay = $('#overlay');
-    const canvas = document.getElementById('visualizerCanvas');
-    const ctx = canvas.getContext('2d');
-    const tracklist = $('#tracklist');
-    const nowTitle = $('#nowTitle');
-    const nowArtist = $('#nowArtist');
-    const popupTitle = $('#popupTitle');
-    const popupArtist = $('#popupArtist');
-    const closePopup = $('#closePopup');
-    const pauseBtn = $('#pauseBtn');
-    const modeViz = $('#modeViz');
-    const modeGame = $('#modeGame');
-    const seek = $('#seek');
-    const volume = $('#volume');
-    const fileInput = $('#file');
-    const demoBtn = $('#demo');
-    const openFirst = $('#openFirst');
-    const downloadBtn = $('#downloadBtn');
+    <div class="music-player">
+        <div class="now-playing">
+            <h3>NOW PLAYING</h3>
+            <div class="song-title" id="currentTitle">STARS BURN OUT</div>
+            <div class="song-artist" id="currentArtist">CYKIM & JUSTIN</div>
+        </div>
+        <div id="youtubePlayer"></div>
+        <div class="player-controls">
+            <button class="control-btn" id="prevBtn">◄</button>
+            <button class="control-btn" id="playBtn">▶</button>
+            <button class="control-btn" id="nextBtn">►</button>
+        </div>
+        <div class="volume-control">
+            <label>VOL</label>
+            <input type="range" id="volume" min="0" max="100" value="50">
+        </div>
+    </div>
 
-    let audio = new Audio();
-    audio.crossOrigin = 'anonymous';
-    audio.preload = 'auto';
-    audio.loop = false;
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-    let ctxAudio, analyser, sourceNode, dataArray, bufferLength;
-    let animationId;
-    let mode = 'visualizer'; // or 'game'
-    let isPlaying = false;
+        const songs = [
+            { title: 'STARS BURN OUT', artist: 'CYKIM & JUSTIN', videoId: 'hcfvx04szGA', constellation: 'Orion' },
+            { title: 'PERFECT', artist: 'shiki', videoId: 'U1usrHw-GvI', constellation: 'Cassiopeia' },
+            { title: 'GALAXY', artist: 'JID', videoId: 'IUE5m6vfCAg', constellation: 'Big Dipper' },
+            { title: 'GỬI VỀ TRÁI ĐẤT XA XÔI', artist: 'Dấu Vân Tay', videoId: 'vXn-yQwXShE', constellation: 'Leo' },
+            { title: 'DAGGERS', artist: 'Kali Uchis', videoId: '4omO2Zwxhuw', constellation: 'Scorpius' },
+            { title: 'ALL I CAN SAY', artist: 'kenji', videoId: 'obBXhTwFsKQ', constellation: 'Lyra' },
+            { title: 'OCEAN TIDE', artist: 'CYKIM & JUSTIN', videoId: 'Dbv3JNfF2Bg', constellation: 'Aquarius' },
+            { title: 'TEJANO BLUE', artist: 'Cigarettes After Sex', videoId: '--JuMkludKM', constellation: 'Cygnus' },
+            { title: 'MOON', artist: 'Daniel Caesar, Bon Iver', videoId: 'Cz4arkvTXfE', constellation: 'Cancer' },
+            { title: 'SATURN', artist: 'SZA', videoId: 'V2G8ESoDXm8', constellation: 'Gemini' }
+        ];
 
-    // resize canvas to CSS pixels
-    function resizeCanvas(){
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = canvas.clientWidth * dpr;
-      canvas.height = 420 * dpr;
-      ctx.scale(dpr, dpr);
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+        const constellations = [
+            [{x: 0.20, y: 0.25}, {x: 0.24, y: 0.22}, {x: 0.28, y: 0.25}, {x: 0.22, y: 0.32}, {x: 0.24, y: 0.35}, {x: 0.26, y: 0.32}, {x: 0.24, y: 0.40}],
+            [{x: 0.45, y: 0.18}, {x: 0.50, y: 0.22}, {x: 0.55, y: 0.18}, {x: 0.60, y: 0.22}, {x: 0.65, y: 0.18}],
+            [{x: 0.70, y: 0.25}, {x: 0.74, y: 0.28}, {x: 0.78, y: 0.30}, {x: 0.82, y: 0.32}, {x: 0.80, y: 0.38}, {x: 0.76, y: 0.40}],
+            [{x: 0.25, y: 0.60}, {x: 0.30, y: 0.58}, {x: 0.35, y: 0.60}, {x: 0.38, y: 0.65}, {x: 0.35, y: 0.70}, {x: 0.30, y: 0.68}],
+            [{x: 0.60, y: 0.65}, {x: 0.64, y: 0.63}, {x: 0.68, y: 0.65}, {x: 0.70, y: 0.68}, {x: 0.72, y: 0.72}, {x: 0.75, y: 0.75}],
+            [{x: 0.15, y: 0.50}, {x: 0.18, y: 0.48}, {x: 0.21, y: 0.50}, {x: 0.19, y: 0.53}],
+            [{x: 0.50, y: 0.70}, {x: 0.53, y: 0.68}, {x: 0.56, y: 0.70}, {x: 0.54, y: 0.73}, {x: 0.52, y: 0.76}],
+            [{x: 0.40, y: 0.35}, {x: 0.43, y: 0.33}, {x: 0.46, y: 0.35}, {x: 0.43, y: 0.38}, {x: 0.43, y: 0.42}],
+            [{x: 0.35, y: 0.45}, {x: 0.38, y: 0.43}, {x: 0.41, y: 0.45}, {x: 0.39, y: 0.48}],
+            [{x: 0.60, y: 0.40}, {x: 0.63, y: 0.38}, {x: 0.66, y: 0.40}, {x: 0.63, y: 0.43}, {x: 0.60, y: 0.45}]
+        ];
 
-    function setupAudioGraph(){
-      if (ctxAudio) return;
-      ctxAudio = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = ctxAudio.createAnalyser();
-      analyser.fftSize = 512;
-      bufferLength = analyser.frequencyBinCount;
-      dataArray = new Uint8Array(bufferLength);
-      sourceNode = ctxAudio.createMediaElementSource(audio);
-      sourceNode.connect(analyser);
-      analyser.connect(ctxAudio.destination);
-    }
+        let currentSong = 0;
+        let isPlaying = false;
+        let player;
+        const stars = [];
+        const constellationStars = [];
 
-    function startPlayback(){
-      setupAudioGraph();
-      audio.play();
-      isPlaying = true;
-      pauseBtn.textContent = 'pause';
-      runLoop();
-    }
-    function pausePlayback(){
-      audio.pause();
-      isPlaying = false;
-      pauseBtn.textContent = 'play';
-      cancelAnimationFrame(animationId);
-    }
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.brightness = Math.random();
+                this.speed = Math.random() * 0.02;
+            }
 
-    pauseBtn.addEventListener('click', ()=>{ if(isPlaying) pausePlayback(); else startPlayback(); });
+            update() {
+                this.brightness += this.speed;
+                if (this.brightness > 1 || this.brightness < 0.3) this.speed *= -1;
+            }
 
-    volume.addEventListener('input', e=>{ audio.volume = e.target.value });
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.brightness})`;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+            }
+        }
 
-    // track click handler
-    function openOverlayWithTrack(listItem, localBlobUrl){
-      const src = localBlobUrl || listItem.dataset.audio;
-      const artist = listItem.dataset.artist || '';
-      const title = listItem.querySelector('.title')?.textContent || 'track';
+        class ConstellationStar {
+            constructor(songIndex, posX, posY) {
+                this.x = posX;
+                this.y = posY;
+                this.size = 5;
+                this.songIndex = songIndex;
+                this.hoverRadius = 30;
+            }
 
-      audio.src = src;
-      popupTitle.textContent = title;
-      popupArtist.textContent = artist;
-      nowTitle.textContent = title;
-      nowArtist.textContent = artist;
+            draw() {
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'white';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
 
-      overlay.classList.add('open');
-      overlay.setAttribute('aria-hidden','false');
+            isHovered(mouseX, mouseY) {
+                const dist = Math.sqrt((mouseX - this.x) ** 2 + (mouseY - this.y) ** 2);
+                return dist < this.hoverRadius;
+            }
+        }
 
-      // start audio context on user gesture
-      if (ctxAudio && ctxAudio.state === 'suspended') ctxAudio.resume();
-      startPlayback();
-    }
+        for (let i = 0; i < 200; i++) {
+            stars.push(new Star());
+        }
 
-    tracklist.addEventListener('click', e=>{
-      const li = e.target.closest('li.song');
-      if (!li) return;
-      openOverlayWithTrack(li);
-    });
+        for (let i = 0; i < constellations.length; i++) {
+            const constellation = constellations[i];
+            for (let j = 0; j < constellation.length; j++) {
+                const posX = constellation[j].x * canvas.width;
+                const posY = constellation[j].y * canvas.height;
+                constellationStars.push(new ConstellationStar(i, posX, posY));
+            }
+        }
 
-    // keyboard accessible
-    $$('.song').forEach(li=>{
-      li.addEventListener('keydown', e=>{ if(e.key === 'Enter' || e.key === ' ') { openOverlayWithTrack(li); e.preventDefault(); } });
-    });
+        function drawConstellation(songIndex) {
+            const constellation = constellations[songIndex];
+            if (!constellation) return;
 
-    closePopup.addEventListener('click', ()=>{
-      overlay.classList.remove('open');
-      overlay.setAttribute('aria-hidden','true');
-      pausePlayback();
-      audio.src = '';
-    });
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
 
-    // seek bar
-    audio.addEventListener('timeupdate', ()=>{
-      if (audio.duration) seek.value = audio.currentTime / audio.duration;
-    });
-    seek.addEventListener('input', ()=>{
-      if (!audio.duration) return; audio.currentTime = seek.value * audio.duration;
-    });
+            for (let i = 0; i < constellation.length; i++) {
+                const x = constellation[i].x * canvas.width;
+                const y = constellation[i].y * canvas.height;
+                
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
 
-    // demo oscillator when no file is available
-    demoBtn.addEventListener('click', ()=>{
-      // create a short demo tone by generating an offline blob using Oscillator and MediaRecorder is messy.
-      // instead: use a scheduled oscillator that feeds analyzer via an AudioContext, but use a MediaStreamDestination and set audio.srcObject
-      const c = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = c.createOscillator();
-      const gain = c.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.value = 220;
-      gain.gain.value = 0.3;
-      osc.connect(gain);
-      gain.connect(c.destination);
-      osc.start();
-      // connect to visualizer by wiring aux
-      // stop after long enough and inform the user; for simplicity we'll create a short silent audio element pointing nowhere and open overlay
-      const fake = document.createElement('audio');
-      fake.src = '';
-      fake.loop = true;
-      // hand off to overlay but keep the oscillator pumping into our analyser
-      // simplified approach: close over the real audio: use audio but play silence and just connect analyser to context
-      alert('demo oscillator started — click visualizer to see reactive visuals (oscillator will run in a separate audio context)');
-    });
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // local file load
-    fileInput.addEventListener('change', e=>{
-      const f = e.target.files[0];
-      if (!f) return;
-      const url = URL.createObjectURL(f);
-      // create a li and prepend to list
-      const li = document.createElement('li');
-      li.className = 'song'; li.tabIndex = 0; li.dataset.audio = url; li.dataset.artist = f.name;
-      li.innerHTML = `<div><div class="title">${f.name}</div><div class="artist">local file</div></div><div class="meta">▶</div>`;
-      tracklist.prepend(li);
-      li.addEventListener('keydown', ev=>{ if(ev.key==='Enter') openOverlayWithTrack(li); });
-      // auto-open
-      openOverlayWithTrack(li, url);
-    });
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
 
-    // set up audio analyser loop
-    function runLoop(){
-      animationId = requestAnimationFrame(runLoop);
-      analyser.getByteFrequencyData(dataArray);
-      drawVisualizer(dataArray);
-      // game tick when in game mode
-      if (mode === 'game') runGameTick(dataArray);
-    }
+            drawConstellation(currentSong);
 
-    // route visualizer by track type
-    function drawVisualizer(freq){
-      const mode = currentVizMode;
-      if(mode === 'bars') return drawBars(freq);
-      if(mode === 'circle') return drawCircle(freq);
-      if(mode === 'orbit') return drawOrbit(freq);
-      if(mode === 'pulse') return drawPulse(freq);
-      return drawBars(freq);
-    }
+            constellationStars.forEach(star => star.draw());
 
-    function drawBars(freq){
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      ctx.clearRect(0,0,w,h);
-      const bars = 64;
-      const step = Math.floor(freq.length / bars);
-      const barW = w / bars - 2;
-      for (let i=0;i<bars;i++){
-        const v = freq[i*step] / 255;
-        const bh = v * (h - 40);
-        const x = i*(barW+2);
-        ctx.fillStyle = 'rgba(159,214,255,'+(0.05+v*0.25)+')';
-        ctx.fillRect(x+1, h-bh, barW, bh);
-      }
-    }
+            requestAnimationFrame(animate);
+        }
 
-    function drawCircle(freq){
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      ctx.clearRect(0,0,w,h);
-      const avg = freq.reduce((a,b)=>a+b,0)/freq.length;
-      const r = 40 + (avg/255)*120;
-      ctx.beginPath(); ctx.arc(w/2, h/2, r, 0, Math.PI*2);
-      ctx.strokeStyle = 'rgba(217,204,255,0.4)'; ctx.lineWidth = 4; ctx.stroke();
-    }
+        animate();
 
-    function drawOrbit(freq){
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      ctx.clearRect(0,0,w,h);
-      const cx=w/2, cy=h/2;
-      const energy=freq[10]/255;
-      for(let i=0;i<6;i++){
-        const angle = performance.now()/600 + i;
-        const r = 60 + i*22 + energy*40;
-        const x=cx + Math.cos(angle)*r;
-        const y=cy + Math.sin(angle)*r;
-        ctx.beginPath(); ctx.arc(x,y,8+energy*10,0,Math.PI*2);
-        ctx.fillStyle='rgba(159,214,255,0.25)'; ctx.fill();
-      }
-    }
+        function updateNowPlaying() {
+            document.getElementById('currentTitle').textContent = songs[currentSong].title;
+            document.getElementById('currentArtist').textContent = songs[currentSong].artist;
+            document.querySelectorAll('.song-item').forEach((item, index) => {
+                item.classList.toggle('active', index === currentSong);
+            });
+        }
 
-    function drawPulse(freq){
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      ctx.clearRect(0,0,w,h);
-      const energy=freq[5]/255;
-      const barH = 100 + energy*200;
-      ctx.fillStyle='rgba(255,215,106,0.3)';
-      ctx.fillRect(w/2-25, h/2-barH/2, 50, barH);
-    }(freq){
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      ctx.clearRect(0,0,w,h);
+        const starLabel = document.getElementById('starLabel');
 
-      const bars = 64;
-      const step = Math.floor(freq.length / bars);
-      const barW = w / bars - 2;
-      for (let i=0;i<bars;i++){
-        const v = freq[i*step] / 255;
-        const bh = v * (h - 40);
-        const x = i*(barW+2);
-        // gradient fill
-        const g = ctx.createLinearGradient(x, h, x, h-bh);
-        g.addColorStop(0, 'rgba(159,214,255,0.06)');
-        g.addColorStop(0.6, 'rgba(217,204,255,0.12)');
-        g.addColorStop(1, 'rgba(255,215,106,0.22)');
-        ctx.fillStyle = g;
-        ctx.fillRect(x+1, h-bh, barW, bh);
-      }
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            let hoveredStar = null;
+            for (const star of constellationStars) {
+                if (star.isHovered(mouseX, mouseY)) {
+                    hoveredStar = star;
+                    break;
+                }
+            }
+            
+            if (hoveredStar) {
+                starLabel.textContent = `${songs[hoveredStar.songIndex].constellation}: ${songs[hoveredStar.songIndex].title}`;
+                starLabel.style.left = e.clientX + 15 + 'px';
+                starLabel.style.top = e.clientY - 35 + 'px';
+                starLabel.style.opacity = '1';
+                canvas.style.cursor = 'pointer';
+            } else {
+                starLabel.style.opacity = '0';
+                canvas.style.cursor = 'default';
+            }
+        });
 
-      // small center glow
-      ctx.beginPath();
-      ctx.arc(w/2, h/2, 28 + (freq[10]/255)*40, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(159,214,255,0.02)';
-      ctx.fill();
-    }
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            for (const star of constellationStars) {
+                if (star.isHovered(mouseX, mouseY)) {
+                    currentSong = star.songIndex;
+                    updateNowPlaying();
+                    if (player && player.loadVideoById) {
+                        player.loadVideoById(songs[currentSong].videoId);
+                        player.playVideo();
+                        isPlaying = true;
+                        document.getElementById('playBtn').textContent = '■';
+                    }
+                    break;
+                }
+            }
+        });
 
-    // mini-game routing
-    function runGameTick(freq){
-      if(currentGameMode === 'falling-nodes') return gameFalling(freq);
-      if(currentGameMode === 'click-waves') return gameWaves(freq);
-      if(currentGameMode === 'shatter') return gameShatter(freq);
-      if(currentGameMode === 'slice') return gameSlice(freq);
-    }
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
 
-    // basic falling nodes
-    let nodes=[];
-    function gameFalling(freq){
-      const avg = freq.reduce((a,b)=>a+b,0)/freq.length/255;
-      if (Math.random() < 0.12 + avg*0.4) nodes.push({x:Math.random()*canvas.clientWidth,y:-20,r:16+avg*22,s:2+avg*6});
-      const w=canvas.clientWidth, h=canvas.clientHeight;
-      ctx.clearRect(0,0,w,h); drawBars(freq);
-      nodes.forEach(n=>{ n.y+=n.s; ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fillStyle='rgba(217,204,255,0.2)'; ctx.fill();});
-      nodes = nodes.filter(n=>n.y<h+40);
-    }
+        window.onYouTubeIframeAPIReady = function() {
+            player = new YT.Player('youtubePlayer', {
+                height: '0',
+                width: '0',
+                videoId: songs[0].videoId,
+                playerVars: { 'playsinline': 1, 'controls': 0 },
+                events: {
+                    'onReady': (e) => e.target.setVolume(50),
+                    'onStateChange': (e) => {
+                        if (e.data == 0) {
+                            currentSong = (currentSong + 1) % songs.length;
+                            updateNowPlaying();
+                            player.loadVideoById(songs[currentSong].videoId);
+                        }
+                        isPlaying = (e.data == 1);
+                        document.getElementById('playBtn').textContent = isPlaying ? '■' : '▶';
+                    }
+                }
+            });
+        };
 
-    function gameWaves(freq){
-      const w=canvas.clientWidth, h=canvas.clientHeight;
-      ctx.clearRect(0,0,w,h);
-      const mid = h/2;
-      for(let i=0;i<freq.length;i+=8){
-        const amp = freq[i]/255 * 60;
-        ctx.beginPath(); ctx.moveTo(0,mid);
-        ctx.quadraticCurveTo(w/2, mid-amp, w, mid);
-        ctx.strokeStyle='rgba(159,214,255,0.3)'; ctx.stroke();
-      }
-    }
+        document.getElementById('playBtn').onclick = () => {
+            if (player) isPlaying ? player.pauseVideo() : player.playVideo();
+        };
 
-    let shards=[];
-    function gameShatter(freq){
-      const w=canvas.clientWidth, h=canvas.clientHeight;
-      ctx.clearRect(0,0,w,h);
-      if(Math.random()<0.1){ shards.push({x:w/2,y:h/2,dx:(Math.random()-0.5)*10,dy:(Math.random()-0.5)*10,life:60}); }
-      shards.forEach(s=>{ s.x+=s.dx; s.y+=s.dy; s.life--; ctx.fillStyle='rgba(255,215,106,0.4)'; ctx.fillRect(s.x,s.y,6,6);});
-      shards = shards.filter(s=>s.life>0);
-    }
+        document.getElementById('prevBtn').onclick = () => {
+            currentSong = (currentSong - 1 + songs.length) % songs.length;
+            updateNowPlaying();
+            if (player) {
+                player.loadVideoById(songs[currentSong].videoId);
+                if (isPlaying) player.playVideo();
+            }
+        };
 
-    function gameSlice(freq){
-      const w=canvas.clientWidth, h=canvas.clientHeight;
-      ctx.clearRect(0,0,w,h);
-      const energy=freq[10]/255;
-      ctx.strokeStyle='rgba(255,215,106,0.35)'; ctx.lineWidth=6;
-      ctx.beginPath(); ctx.moveTo(0,h*energy); ctx.lineTo(w,h*energy);
-      ctx.stroke();
-    }
-    let nodes = [];
-    function spawnNode(intensity){
-      nodes.push({x: Math.random()*canvas.clientWidth, y: -20, r: 14 + intensity*20, speed: 1 + intensity*6, alive:true});
-    }
-    canvas.addEventListener('click', e=>{
-      if (mode !== 'game') return;
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      for (let n of nodes){
-        if (!n.alive) continue;
-        const dx = x - n.x; const dy = y - n.y;
-        if (Math.sqrt(dx*dx+dy*dy) < n.r){ n.alive = false; /* score */ }
-      }
-    });
+        document.getElementById('nextBtn').onclick = () => {
+            currentSong = (currentSong + 1) % songs.length;
+            updateNowPlaying();
+            if (player) {
+                player.loadVideoById(songs[currentSong].videoId);
+                if (isPlaying) player.playVideo();
+            }
+        };
 
-    function runGameTick(freq){
-      // spawn probability based on average energy
-      const avg = freq.reduce((a,b)=>a+b,0)/freq.length/255;
-      if (Math.random() < Math.min(0.08 + avg*0.5, 0.4)) spawnNode(avg);
+        document.getElementById('volume').oninput = (e) => {
+            if (player) player.setVolume(e.target.value);
+        };
 
-      // update nodes
-      const w = canvas.clientWidth; const h = canvas.clientHeight;
-      ctx.clearRect(0,0,w,h);
-      // draw background visualizer faintly
-      drawVisualizer(freq);
+        document.querySelectorAll('.song-item').forEach((item, index) => {
+            item.onclick = () => {
+                showSongPopup(index);
+            };
+        });
 
-      for (let n of nodes){
-        if (!n.alive) continue;
-        n.y += n.speed;
-        // draw node
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(217,204,255,0.12)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(159,214,255,0.22)';
-        ctx.stroke();
-        if (n.y > h + 50) n.alive = false;
-      }
-      nodes = nodes.filter(n=>n.alive);
-    }
+        function showSongPopup(songIndex) {
+            currentSong = songIndex;
+            updateNowPlaying();
+            
+            document.getElementById('popupTitle').textContent = songs[songIndex].title;
+            document.getElementById('popupArtist').textContent = songs[songIndex].artist;
+            document.getElementById('popupConstellation').textContent = `CONSTELLATION: ${songs[songIndex].constellation.toUpperCase()}`;
+            
+            const popupCanvas = document.getElementById('popupCanvas');
+            
+            // Image URLs for specific songs
+            const imageUrls = {
+                0: 'https://i.imgur.com/5931rEr.jpeg', // Stars Burn Out
+                1: 'https://i.imgur.com/bSuKVN8.jpeg', // Perfect
+                2: 'https://i.imgur.com/QCzt09z.jpeg', // Galaxy
+                3: 'https://i.imgur.com/18LSf5t.jpeg', // Gửi Về Trái Đất Xa Xôi
+                4: 'https://i.imgur.com/b5JvqCm.jpeg', // Daggers
+                5: 'https://i.imgur.com/OeQr3gJ.jpeg', // All I Can Say
+                6: 'https://i.imgur.com/MwQt5jQ.jpeg', // Ocean Tide
+                7: 'https://i.imgur.com/mb22tQX.jpeg', // Tejano Blue
+                8: 'https://i.imgur.com/sALo1as.jpeg', // Moon
+                9: 'https://i.imgur.com/PHUXxke.jpeg'  // Saturn
+            };
+            
+            if (imageUrls[songIndex]) {
+                // Show as background image
+                popupCanvas.style.backgroundImage = `url(${imageUrls[songIndex]})`;
+            } else {
+                // Clear background and draw pattern
+                popupCanvas.style.backgroundImage = 'none';
+                const canvas = document.createElement('canvas');
+                canvas.width = 460;
+                canvas.height = 300;
+                const ctx = canvas.getContext('2d');
+                generateSongVisual(ctx, songIndex, 460, 300);
+                popupCanvas.style.backgroundImage = `url(${canvas.toDataURL()})`;
+            }
+            
+            document.getElementById('songPopup').classList.add('active');
+            
+            // Play the song
+            if (player && player.loadVideoById) {
+                player.loadVideoById(songs[songIndex].videoId);
+                player.playVideo();
+                isPlaying = true;
+                document.getElementById('playBtn').textContent = '■';
+            }
+        }
 
-    modeViz.addEventListener('click', ()=>{ mode='visualizer'; modeViz.classList.add('active'); modeGame.classList.remove('active'); });
-    modeGame.addEventListener('click', ()=>{ mode='game'; modeGame.classList.add('active'); modeViz.classList.remove('active'); });
+        function closePopup() {
+            document.getElementById('songPopup').classList.remove('active');
+        }
 
-    // update seek range on duration change
-    audio.addEventListener('loadedmetadata', ()=>{ if(audio.duration) seek.max = 1; });
-
-    // wire openFirst quick button
-    openFirst.addEventListener('click', ()=>{ const first = tracklist.querySelector('li.song'); if(first) openOverlayWithTrack(first); });
-
-    // download current track if CORS allows
-    downloadBtn.addEventListener('click', ()=>{
-      if (!audio.src) return alert('no track loaded');
-      try{
-        const a = document.createElement('a');
-        a.href = audio.src; a.download = (popupTitle.textContent || 'track') + '.mp3';
-        document.body.appendChild(a); a.click(); a.remove();
-      }catch(err){ alert('download blocked by browser/CORS'); }
-    });
-
-    // make sure when audio starts we hook analyser
-    audio.addEventListener('play', ()=>{ try{ if(!ctxAudio) setupAudioGraph(); }catch(e){console.warn(e)} });
-
-    // small polish: press Esc to close
-    window.addEventListener('keydown', e=>{ if(e.key==='Escape') { if(overlay.classList.contains('open')) closePopup.click(); } });
-
-    // initial volume
-    audio.volume = volume.value;
-
-    // fallback: if user never loads audio, we still create audio context on gesture
-    document.addEventListener('click', ()=>{ if(!ctxAudio){ try{ ctxAudio = new (window.AudioContext||window.webkitAudioContext)(); ctxAudio.suspend(); }catch(e){} } }, {once:true});
-  </script>
+        function generateSongVisual(ctx, songIndex, w, h) {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, w, h);
+            
+            switch(songIndex) {
+                case 0: // Stars Burn Out - now handled by img tag
+                case 6: // Ocean Tide - now handled by img tag
+                    // These are now shown as <img> elements, not canvas
+                    break;
+                    
+                case 1: // Perfect - Geometric grid
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    const gridSize = 40;
+                    for (let x = 0; x < w; x += gridSize) {
+                        for (let y = 0; y < h; y += gridSize) {
+                            if (Math.random() > 0.5) {
+                                ctx.strokeRect(x, y, gridSize, gridSize);
+                            } else {
+                                ctx.beginPath();
+                                ctx.moveTo(x, y);
+                                ctx.lineTo(x + gridSize, y + gridSize);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    break;
+                    
+                case 2: // Galaxy - Spiral
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    for (let i = 0; i < 500; i++) {
+                        const angle = i * 0.1;
+                        const radius = i * 0.5;
+                        const x = w / 2 + Math.cos(angle) * radius;
+                        const y = h / 2 + Math.sin(angle) * radius;
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    break;
+                    
+                case 3: // Gửi Về Trái Đất - Falling dots
+                    for (let i = 0; i < 100; i++) {
+                        const x = Math.random() * w;
+                        const y = Math.random() * h;
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(x, y, 3, 10);
+                    }
+                    break;
+                    
+                case 4: // Daggers - Sharp angles
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 3;
+                    for (let i = 0; i < 20; i++) {
+                        const x1 = Math.random() * w;
+                        const y1 = Math.random() * h;
+                        const x2 = x1 + (Math.random() - 0.5) * 100;
+                        const y2 = y1 + (Math.random() - 0.5) * 100;
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.stroke();
+                    }
+                    break;
+                    
+                case 5: // All I Can Say - Sound waves
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    for (let wave = 0; wave < 5; wave++) {
+                        ctx.beginPath();
+                        for (let x = 0; x < w; x += 5) {
+                            const y = h / 2 + Math.sin(x * 0.05 + wave * 2) * (30 + wave * 10);
+                            if (x === 0) ctx.moveTo(x, y);
+                            else ctx.lineTo(x, y);
+                        }
+                        ctx.stroke();
+                    }
+                    break;
+                    
+                case 6: // Ocean Tide - Image
+                    const oceanImg = new Image();
+                    oceanImg.onload = () => {
+                        const scale = Math.min(w / oceanImg.width, h / oceanImg.height);
+                        const x = (w - oceanImg.width * scale) / 2;
+                        const y = (h - oceanImg.height * scale) / 2;
+                        ctx.drawImage(oceanImg, x, y, oceanImg.width * scale, oceanImg.height * scale);
+                    };
+                    oceanImg.onerror = () => {
+                        // Fallback waves pattern
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 3;
+                        for (let wave = 0; wave < 8; wave++) {
+                            ctx.beginPath();
+                            for (let x = 0; x < w; x += 5) {
+                                const y = wave * 40 + Math.sin(x * 0.02) * 20;
+                                if (x === 0) ctx.moveTo(x, y);
+                                else ctx.lineTo(x, y);
+                            }
+                            ctx.stroke();
+                        }
+                    };
+                    oceanImg.src = 'https://i.imgur.com/MwQt5jQ.jpeg';
+                    break;
+                    
+                case 7: // Tejano Blue - Smoke trails
+                    for (let i = 0; i < 10; i++) {
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.3 - i * 0.02})`;
+                        ctx.lineWidth = 20 - i;
+                        ctx.beginPath();
+                        for (let x = 0; x < w; x += 10) {
+                            const y = h / 2 + Math.sin(x * 0.01 + i) * (50 + i * 10);
+                            if (x === 0) ctx.moveTo(x, y);
+                            else ctx.lineTo(x, y);
+                        }
+                        ctx.stroke();
+                    }
+                    break;
+                    
+                case 8: // Moon - Orbits
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    for (let i = 1; i <= 5; i++) {
+                        ctx.beginPath();
+                        ctx.arc(w / 2, h / 2, i * 30, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(w / 2, h / 2, 20, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                    
+                case 9: // Saturn - Rings
+                    ctx.fillStyle = '#fff';
+                    ctx.beginPath();
+                    ctx.arc(w / 2, h / 2, 40, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 3;
+                    for (let i = 1; i <= 4; i++) {
+                        ctx.beginPath();
+                        ctx.ellipse(w / 2, h / 2, 60 + i * 20, (60 + i * 20) * 0.3, 0, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                    break;
+            }
+        }
+    </script>
 </body>
 </html>
 
